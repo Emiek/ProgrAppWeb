@@ -1,13 +1,16 @@
 <?php
+include 'showpage.php';
+include 'cfg.php';
+$conn = db_connect();
 error_reporting(E_ALL ^ E_NOTICE ^ E_WARNING);
 /* po tym komentarzu będzie kod do dynamicznego ładowania stron */
-if($_GET['idp'] == '') $strona = 'html/glowna.html';
-if($_GET['idp'] == 'beginner') $strona = 'html/beginner.html';
-if($_GET['idp'] == 'grunt') $strona = 'html/grunt.html';
-if($_GET['idp'] == 'kontakt') $strona = 'html/kontakt.html';
-if($_GET['idp'] == 'spinning') $strona = 'html/spinning.html';
-if($_GET['idp'] == 'splawik') $strona = 'html/splawik.html';
-if($_GET['idp'] == 'filmy') $strona = 'html/filmy.html';
+if($_GET['idp'] == '') $strona = PokazPodstrone(7,$conn);
+if($_GET['idp'] == 'beginner') $strona = PokazPodstrone(1,$conn);
+if($_GET['idp'] == 'grunt') $strona = PokazPodstrone(3,$conn);
+if($_GET['idp'] == 'kontakt') $strona = PokazPodstrone(5,$conn);
+if($_GET['idp'] == 'spinning') $strona = PokazPodstrone(2,$conn);
+if($_GET['idp'] == 'splawik') $strona = PokazPodstrone(4,$conn);
+if($_GET['idp'] == 'filmy') $strona = PokazPodstrone(6,$conn);
 ?>
 
 <!DOCTYPE html>
@@ -35,15 +38,13 @@ if($_GET['idp'] == 'filmy') $strona = 'html/filmy.html';
             </tr>
         </table>
         <?php
-            if(file_exists($strona)){
-                include($strona);
-            }
+            echo $strona;
         ?>
 
         <?php
              $nr_indeksu = '164333';
              $nrGrupy = '1';
-             echo 'Autor: Patryk Bachanek '.$nr_indeksu.' grupa '.$nrGrupy.' <br /><br />';
+             echo 'Autor: Patryk Bachanek '.$nr_indeksu.' grupa '.$nrGrupy.' wersja 1.5v <br /><br />';
         ?>
 
     </body>
