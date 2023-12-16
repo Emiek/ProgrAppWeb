@@ -44,7 +44,7 @@ if($_GET['idp'] == 'filmy') $strona = PokazPodstrone(6,$conn);
         <?php
              $nr_indeksu = '164333';
              $nrGrupy = '1';
-             echo 'Autor: Patryk Bachanek '.$nr_indeksu.' grupa '.$nrGrupy.' wersja 1.5v <br /><br />';
+             echo 'Autor: Patryk Bachanek '.$nr_indeksu.' grupa '.$nrGrupy.' wersja 1.6v <br /><br />';
         ?>
 
     </body>

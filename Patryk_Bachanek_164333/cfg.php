@@ -1,5 +1,8 @@
 <?php
 
+$login = 'admin';
+$pass = 'root';
+
 function db_connect()
 {
     mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
@@ -18,6 +21,3 @@ function db_connect()
     }
     return $conn;
 }
-/* You should enable error reporting for mysqli before attempting to make a connection */
-
-
