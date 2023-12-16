@@ -5,9 +5,11 @@
 		<link rel="stylesheet" href="style.css">
 		<meta http-equiv="Content-Language" content="pl" />
 		<meta name="Author" content="Patryk Bachanek" />
+        <script src="kolorujtlo.js"></script>
+        <script src="timedate.js"></script>
 		<title>Moje hobby to wędkarstwo</title>
 	</head>
-	<body>
+	<body onload="startclock()">
 		<table class="menu">
 			<tr>
 				<td> <a href="main.html"> Home </a></td>
@@ -33,8 +35,21 @@
 							 <textarea name="message" rows="10" cols="30">
 							</textarea><br><br>
 							<input type="submit" value="Wyślij">
-						</form> 
+						</form>
+                        <br>
+                        <form>
+                            <input type="button" value="żółty" onclick="changeBackground('#FFF000')">
+                            <input type="button" value="czarny" onclick="changeBackground('#000000')">
+                            <input type="button" value="biały" onclick="changeBackground('#FFFFFF')">
+                            <input type="button" value="zielony" onclick="changeBackground('#00FF00')">
+                            <input type="button" value="niebieski" onclick="changeBackground('#0000FF')">
+                            <input type="button" value="pomarańczowy" onclick="changeBackground('#FFF800')">
+                            <input type="button" value="szary" onclick="changeBackground('#c0c0c0')">
+                            <input type="button" value="czerowny" onclick="changeBackground('#FF0000')">
+                        </form>
 					</div>
+                    <div id="zegarek"></div>
+                    <div id="data"></div>
 				</td>
 			</tr>
 		</table>
