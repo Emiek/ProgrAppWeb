@@ -1,6 +1,11 @@
 <?php
 include_once '../cfg.php';
 
+// ----------------------------//
+//    FormularzLogowania       //
+// metoda ta tworzy formularz  //
+// logowania html i zwaraca go //
+//-----------------------------//
 function FormularzLogowania()
 {
     $wynik = '
@@ -20,6 +25,14 @@ function FormularzLogowania()
     return $wynik;
 }
 
+// ----------------------------//
+//       ListaPodstron          //
+// metoda ta wyświetla listę   //
+// stron z opcjami edycji lub   //
+// usunięcia każdej strony.     //
+// Pobiera dane z bazy danych   //
+// i generuje kod HTML.         //
+// ----------------------------//
 function ListaPodstron()
 {
     $conn = db_connect();
@@ -29,9 +42,9 @@ function ListaPodstron()
     $stmt->bind_result($id, $page_title, $page_content, $status);
     while ($stmt->fetch()) {
         echo '<div class="page-entry" style="display: flex;align-items: center;">
-            <p>' . $id . ' ' . $page_title . '        
+            <p>' . htmlspecialchars($id) . ' ' . htmlspecialchars($page_title) . '        
             <form action="" method="post" style="margin-left: 10px">
-                <input type="hidden" name="id_to_update" value="' . $id . '">
+                <input type="hidden" name="id_to_update" value="' . htmlspecialchars($id) . '">
                 <input type=submit name=update value=edytuj> 
                 <input type=submit name=delete value=usuń>
             </form>
@@ -41,6 +54,16 @@ function ListaPodstron()
 
 }
 
+// ----------------------------//
+//     EdytujPodstrone          //
+// metoda ta wyświetla formularz//
+// do edycji istniejącej strony.//
+// Pobiera dane strony z bazy   //
+// danych na podstawie podanego //
+// ID.                          //
+// parametr int $id ID strony do  //
+// edycji.                      //
+// ----------------------------//
 function EdytujPodstrone($id)
 {
     $conn = db_connect();
@@ -58,7 +81,7 @@ function EdytujPodstrone($id)
         <label for="content">Treść:</label>
         <p></p>
         <textarea id="content" name="content" rows="20" cols="100"
-                  required>' . htmlspecialchars($page_content).'</textarea>
+                  required>' . htmlspecialchars_decode($page_content) . '</textarea>
         <p></p>
         <label>
             <input type="checkbox" name="status" ' . ($status ? 'checked' : '') . ' >
@@ -71,6 +94,13 @@ function EdytujPodstrone($id)
 
 }
 
+// ----------------------------//
+//    DodajNowaPodstrone        //
+// metoda ta wyświetla formularz//
+// do dodawania nowej strony.    //
+// Zapewnia pola do wprowadzenia //
+// tytułu i treści nowej strony. //
+// ----------------------------//
 function DodajNowaPodstrone()
 {
 
@@ -86,6 +116,13 @@ function DodajNowaPodstrone()
         </form>';
 }
 
+// ----------------------------//
+//      UsunPodstrone           //
+// metoda ta usuwa stronę na   //
+// podstawie podanego ID.       //
+// parametr int $id ID strony do  //
+// usunięcia.                   //
+// ----------------------------//
 function UsunPodstrone($id)
 {
     $conn = db_connect();
@@ -105,6 +142,8 @@ function UsunPodstrone($id)
 }
 
 global $login, $pass;
+$login = htmlspecialchars($login);
+$pass = htmlspecialchars($pass);
 session_start();
 if (!isset($_SESSION['zalogowany'])) {
     $_SESSION['zalogowany'] = false;
@@ -145,9 +184,9 @@ if ($_SESSION['zalogowany'] === true) {
         EdytujPodstrone($id);
     }
     if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['save'])) {
-        $id = $_POST['id_to_update'];
-        $title = $_POST['title'];
-        $content = $_POST['content'];
+        $id = htmlspecialchars($_POST['id_to_update']);
+        $title = htmlspecialchars($_POST['title']);
+        $content = htmlspecialchars_decode($_POST['content']);
         $status = isset($_POST["status"]) ? 1 : 0;
         $conn = db_connect();
         $stmt = $conn->prepare("UPDATE page_list SET page_title = ?, page_content = ?, status = ? WHERE id = ? LIMIT 1");
@@ -193,4 +232,3 @@ if ($_SESSION['zalogowany'] === true) {
 ?>
 </body>
 </html>
-
