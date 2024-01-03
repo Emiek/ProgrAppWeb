@@ -160,17 +160,19 @@ if ($_SESSION['zalogowany'] !== true) {
     }
 }
 
-include_once '../cfg.php';
 
-class CategoryManager {
+class ZarzadzajKategoriami
+{
     private $conn;
 
-    public function __construct() {
+    public function __construct()
+    {
         // Utwórz połączenie z bazą danych
         $this->conn = db_connect();
     }
 
-    public function __destruct() {
+    public function __destruct()
+    {
         // Zamknij połączenie z bazą danych po zakończeniu działania skryptu
         if ($this->conn) {
             $this->conn->close();
@@ -178,49 +180,55 @@ class CategoryManager {
     }
 
     // Dodaj nową kategorię
-    public function DodajKategorie($motherId, $name) {
-        $query = "INSERT INTO categories (mother_id, name) VALUES (?, ?)";
+    public function DodajKategorie($matka, $nazwa)
+    {
+        $query = "INSERT INTO categories (matka, nazwa) VALUES (?, ?)";
         $stmt = $this->conn->prepare($query);
-        $stmt->bind_param('is', $motherId, $name);
+        $stmt->bind_param('is', $matka, $nazwa);
         $stmt->execute();
         $stmt->close();
     }
 
     // Usuń kategorię
-    public function UsunKategorie($categoryId) {
+    public function UsunKategorie($kategoriaId)
+    {
         $query = "DELETE FROM categories WHERE id = ?";
         $stmt = $this->conn->prepare($query);
-        $stmt->bind_param('i', $categoryId);
+        $stmt->bind_param('i', $kategoriaId);
         $stmt->execute();
         $stmt->close();
     }
 
     // Edytuj kategorię
-    public function EdytujKategorie($categoryId, $name) {
-        $query = "UPDATE categories SET name = ? WHERE id = ?";
+    public function EdytujKategorie($kategoriaId, $nazwa)
+    {
+        $query = "UPDATE categories SET nazwa = ? WHERE id = ?";
         $stmt = $this->conn->prepare($query);
-        $stmt->bind_param('si', $name, $categoryId);
+        $stmt->bind_param('si', $nazwa, $kategoriaId);
         $stmt->execute();
         $stmt->close();
     }
 
     // Pokaż kategorie (generuj drzewo kategorii)
-    public function PokazKategorie() {
-        $this->generateCategoryTree();
+    public function PokazKategorie()
+    {
+        $this->GenerujDrzewoKategorii();
     }
 
     // Prywatna funkcja do generowania drzewa kategorii
-    private function generateCategoryTree($motherId = 0) {
-        $query = "SELECT id, name FROM categories WHERE mother_id = ?";
+    private function GenerujDrzewoKategorii($matka = 0)
+    {
+        $query = "SELECT id, nazwa FROM categories WHERE matka = ?";
         $stmt = $this->conn->prepare($query);
-        $stmt->bind_param('i', $motherId);
+        $stmt->bind_param('i', $matka);
         $stmt->execute();
-        $stmt->bind_result($id, $name);
+        $stmt->bind_result($id, $nazwa);
+        $stmt->store_result();
 
         echo '<ul>';
         while ($stmt->fetch()) {
-            echo '<li>' . $name;
-            $this->generateCategoryTree($id); // Rekurencyjne wywołanie dla podkategorii
+            echo '<li>' . $nazwa;
+            $this->GenerujDrzewoKategorii($id); // Rekurencyjne wywołanie dla podkategorii
             echo '</li>';
         }
         echo '</ul>';
@@ -230,7 +238,28 @@ class CategoryManager {
 }
 
 
+// Utwórz obiekt ZarzadzajKategoriami
+$zarzadzajKategoriami = new ZarzadzajKategoriami();
 
+// Obsługa formularza dodawania kategorii
+if (isset($_POST['DodajKategorie'])) {
+    $matka = $_POST['matkaId'];
+    $nazwa = $_POST['nazwaKategorii'];
+    $zarzadzajKategoriami->DodajKategorie($matka, $nazwa);
+}
+
+// Obsługa formularza usuwania kategorii
+if (isset($_POST['UsunKategorie'])) {
+    $kategoriaId = $_POST['kategoriaId'];
+    $zarzadzajKategoriami->UsunKategorie($kategoriaId);
+}
+
+// Obsługa formularza edycji kategorii
+if (isset($_POST['EdytujKategorie'])) {
+    $kategoriaId = $_POST['kategoriaIdEdytuj'];
+    $nowaNazwa = $_POST['nowaNazwa'];
+    $zarzadzajKategoriami->EdytujKategorie($kategoriaId, $nowaNazwa);
+}
 
 
 ?>
@@ -300,6 +329,34 @@ if ($_SESSION['zalogowany'] === true) {
         $idToDelete = $_POST['id_to_update'];
         UsunPodstrone($idToDelete);
     }
+
+    $zarzadzajKategoriami->PokazKategorie();
+
+    echo '
+        <!-- Formularz dodawania kategorii -->
+        <form method="post">
+            <label for="matkaId">Kategoria nadrzędna (0 dla głównej): </label>
+            <input type="number" name="matkaId" id="matkaId" required>
+            <label for="nazwaKategorii">Nazwa kategorii: </label>
+            <input type="text" name="nazwaKategorii" id="nazwaKategorii" required>
+            <input type="submit" name="DodajKategorie" value="Dodaj kategorię">
+        </form>
+        
+        <!-- Formularz usuwania kategorii -->
+        <form method="post">
+            <label for="kategoriaId">ID kategorii do usunięcia: </label>
+            <input type="number" name="kategoriaId" id="kategoriaId" required>
+            <input type="submit" name="UsunKategorie" value="Usuń kategorię">
+        </form>
+        
+        <!-- Formularz edycji kategorii -->
+        <form method="post">
+            <label for="kategoriaIdEdytuj">ID kategorii do edycji: </label>
+            <input type="number" name="kategoriaIdEdytuj" id="kategoriaIdEdytuj" required>
+            <label for="nowaNazwa">Nowa nazwa kategorii: </label>
+            <input type="text" name="nowaNazwa" id="nowaNazwa" required>
+            <input type="submit" name="EdytujKategorie" value="Edytuj kategorię">
+        </form>';
 }
 
 ?>
