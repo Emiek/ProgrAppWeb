@@ -227,7 +227,7 @@ class ZarzadzajKategoriami
 
         echo '<ul>';
         while ($stmt->fetch()) {
-            echo '<li>' . $nazwa;
+            echo '<li>' . $nazwa . ' (id: ' . $id . ')';
             $this->GenerujDrzewoKategorii($id); // Rekurencyjne wywołanie dla podkategorii
             echo '</li>';
         }
@@ -335,7 +335,9 @@ class ZarzadzajProduktami
             return false; // Produkt jest niedostępny
         }
     }
-    public function PobierzDaneProduktu($produktId) {
+
+    public function PobierzDaneProduktu($produktId)
+    {
         $query = "SELECT * FROM produkty WHERE id = ?";
         $stmt = $this->conn->prepare($query);
         $stmt->bind_param('i', $produktId);
@@ -495,11 +497,32 @@ if ($_SESSION['zalogowany'] === true) {
         UsunPodstrone($idToDelete);
     }
 
+    if (isset($_POST['zapiszEdycje'])) {
+        $idEdytuj = $_POST['idEdytuj'];
+        $nowyTytul = $_POST['tytul'];
+        $nowyOpis = $_POST['opis'];
+        $nowaDataWygasniecia = $_POST['dataWygasniecia'];
+        $nowaCenaNetto = $_POST['cenaNetto'];
+        $nowyPodatekVat = $_POST['podatekVat'];
+        $nowaIloscSztuk = $_POST['iloscSztuk'];
+        $nowaKategoria = $_POST['kategoria'];
+        $nowyGabarytProduktu = $_POST['gabarytProduktu'];
+        $noweZdjecieUrl = $_POST['zdjecieUrl'];
+
+        // Wywolaj funkcje edycji produktu
+        $zarzadzajProduktami->EdytujProdukt($idEdytuj, $nowyTytul, $nowyOpis, $nowaDataWygasniecia, $nowaCenaNetto, $nowyPodatekVat, $nowaIloscSztuk, $nowaKategoria, $nowyGabarytProduktu, $noweZdjecieUrl);
+        header("Location: {$_SERVER['PHP_SELF']}");
+        exit();
+    }
+
+    echo '<h2 style="text-align: center">Lista kategorii</h2>';
+
     $zarzadzajKategoriami->PokazKategorie();
 
     echo '
+        
         <!-- Formularz dodawania kategorii -->
-        <form method="post">
+        <form method="post" class="forms_style">
             <label for="matkaId">Kategoria nadrzędna (0 dla głównej): </label>
             <input type="number" name="matkaId" id="matkaId" required>
             <label for="nazwaKategorii">Nazwa kategorii: </label>
@@ -508,14 +531,14 @@ if ($_SESSION['zalogowany'] === true) {
         </form>
         
         <!-- Formularz usuwania kategorii -->
-        <form method="post">
+        <form method="post" class="forms_style">
             <label for="kategoriaId">ID kategorii do usunięcia: </label>
             <input type="number" name="kategoriaId" id="kategoriaId" required>
             <input type="submit" name="UsunKategorie" value="Usuń kategorię">
         </form>
         
         <!-- Formularz edycji kategorii -->
-        <form method="post">
+        <form method="post" class="forms_style">
             <label for="kategoriaIdEdytuj">ID kategorii do edycji: </label>
             <input type="number" name="kategoriaIdEdytuj" id="kategoriaIdEdytuj" required>
             <label for="nowaNazwa">Nowa nazwa kategorii: </label>
@@ -523,11 +546,11 @@ if ($_SESSION['zalogowany'] === true) {
             <input type="submit" name="EdytujKategorie" value="Edytuj kategorię">
         </form>';
     echo '
-        <h1>Panel Zarządzania Produktami</h1>
+        <h2 style="text-align: center">Panel Zarządzania Produktami</h2>
         
         <!-- Dodawanie nowego produktu -->
-        <form action="" method="post">
-            <h2>Dodaj nowy produkt</h2>
+        <form action="" method="post" style="text-align: center" class="forms_style">
+            <h3>Dodaj nowy produkt</h3>
             <label for="tytul">Tytuł:</label>
             <input type="text" id="tytul" name="tytul" required>
             <br>
@@ -570,8 +593,9 @@ if ($_SESSION['zalogowany'] === true) {
         $produktDoEdycji = $zarzadzajProduktami->PobierzDaneProduktu($idEdytuj);
         // Wyświetl formularz edycji z danymi produktu
         echo '<h2>Edytuj produkt o ID: ' . $idEdytuj . '</h2>';
-        echo '<form action="" method="post">';
+        echo '<form action="" method="post" class="forms_style" style="text-align: center">';
         echo '<label for="tytul">Tytuł:</label>';
+        echo '<input type="hidden" name="idEdytuj" value="' . $idEdytuj . '">';
         echo '<input type="text" id="tytul" name="tytul" value="' . htmlspecialchars($produktDoEdycji['tytul']) . '" required>';
         echo '<br>';
         echo '<label for="opis">Opis:</label>';
@@ -601,6 +625,7 @@ if ($_SESSION['zalogowany'] === true) {
         echo '<input type="submit" name="zapiszEdycje" value="Zapisz Edycję">';
         echo '</form>';
     }
+
 }
 
 ?>

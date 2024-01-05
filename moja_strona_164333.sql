@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sty 03, 2024 at 08:00 AM
+-- Generation Time: Sty 05, 2024 at 03:31 PM
 -- Wersja serwera: 10.4.32-MariaDB
 -- Wersja PHP: 8.2.12
 
@@ -24,22 +24,23 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Struktura tabeli dla tabeli `categories`
+-- Struktura tabeli dla tabeli `kategorie`
 --
 
-CREATE TABLE `categories` (
+CREATE TABLE `kategorie` (
   `id` int(11) NOT NULL,
   `matka` int(11) DEFAULT 0,
   `nazwa` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `categories`
+-- Dumping data for table `kategorie`
 --
 
-INSERT INTO `categories` (`id`, `matka`, `nazwa`) VALUES
+INSERT INTO `kategorie` (`id`, `matka`, `nazwa`) VALUES
 (1, 0, 'dom'),
-(2, 0, 'ogród');
+(2, 0, 'ogród'),
+(3, 0, 'wedkarstwo');
 
 -- --------------------------------------------------------
 
@@ -67,14 +68,43 @@ INSERT INTO `page_list` (`id`, `page_title`, `page_content`, `status`) VALUES
 (6, 'Filmy', '<div style = \"text-align: center\">\r\n    <p>Fanatyk wędkarstwa</p>\r\n    <p>\r\n        <iframe width=\"560\" height=\"315\" src=\"https://www.youtube.com/embed/1lpisIT08Oc?si=CzNoDCrDT47pipgB\" title=\"YouTube video player\" frameborder=\"0\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\" allowfullscreen></iframe>\r\n    </p>\r\n    <p>\r\n        <iframe width=\"560\" height=\"315\" src=\"https://www.youtube.com/embed/qQEYQd3Pnqg?si=ZmgEUZI1BjAnnmEn\" title=\"YouTube video player\" frameborder=\"0\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\" allowfullscreen></iframe>\r\n    </p>\r\n    <p>\r\n        <iframe width=\"560\" height=\"315\" src=\"https://www.youtube.com/embed/Lo_V9QADcqM?si=zjpEXDL4rBrsTbph\" title=\"YouTube video player\" frameborder=\"0\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\" allowfullscreen></iframe>\r\n    </p>\r\n</div>', 1),
 (7, 'Strona główna', '<table class=\"container\">\r\n    <tr>\r\n        <td>\r\n            <h1>Witam na stronie o wędkarstwie</h1>\r\n            <p><i>Na tej stronie dowiesz się jak zacząć wędkować, oraz opisze najbardziej popularne techniki łowienia.</i>\r\n            </p>\r\n            <div class=\"content\" style=\"clear: both; height: 930px\">\r\n                <div class=\"img_content\">\r\n                    <img src=\"img/fish.jpg\" style=\"float: center; width: 100% \" />\r\n                </div>\r\n            </div>\r\n        </td>\r\n    </tr>\r\n</table>\r\n<div id=\"animacjaTestowa1\" class=\"test-block\", style=\"clear: both; margin: 10px\">\r\n    kliknij, a się powiększe\r\n</div>\r\n<script>\r\n    $(\"#animacjaTestowa1\").on(\"click\",function(){\r\n        $(this).animate({\r\n            width:\"500px\",\r\n            opacity: 0.4,\r\n            fontSize: \"3em\",\r\n            borderWidth: \"10px\",\r\n        }, 1500);\r\n    });\r\n</script>\r\n<div id=\"animacjaTestowa2\" class=\"test-block\", style=\"clear: both; margin: 10px\">\r\n    Najedż kursorem,a się powiększe\r\n</div>\r\n<script>\r\n    $(\"#animacjaTestowa2\").on({\r\n        \"mouseover\" : function(){\r\n            $(this).animate({\r\n                width: 300\r\n            }, 800);\r\n        },\r\n        \"mouseout\" : function(){\r\n            $(this).animate({\r\n                width: 200\r\n            }, 800);\r\n        }\r\n    });\r\n</script>\r\n<div id=\"animacjaTestowa3\" class=\"test-block\", style=\"clear: both; margin: 10px\">\r\n    Klikaj, abym urósł\r\n</div>\r\n<script>\r\n    $(\"#animacjaTestowa3\").on(\"click\", function(){\r\n        if (!$(this).is(\":animated\")){\r\n            $(this).animate({\r\n                width: \"+=\" + 50,\r\n                height: \"+=\" + 10,\r\n                opacity: \"-=\" + 0.1,\r\n                duration: 3000\r\n            });\r\n        }\r\n    });\r\n</script>', 1);
 
+-- --------------------------------------------------------
+
+--
+-- Struktura tabeli dla tabeli `produkty`
+--
+
+CREATE TABLE `produkty` (
+  `id` int(11) NOT NULL,
+  `tytul` varchar(255) NOT NULL,
+  `opis` text DEFAULT NULL,
+  `data_utworzenia` datetime DEFAULT current_timestamp(),
+  `data_modyfikacji` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `data_wygasniecia` date DEFAULT NULL,
+  `cena_netto` decimal(10,2) NOT NULL,
+  `podatek_vat` decimal(5,2) NOT NULL,
+  `ilosc_dostepnych_sztuk` int(11) NOT NULL,
+  `status_dostepnosci` enum('Dostępny','Niedostępny') DEFAULT 'Dostępny',
+  `kategoria` int(11) DEFAULT NULL,
+  `gabaryt_produktu` varchar(50) DEFAULT NULL,
+  `zdjecie_url` varchar(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `produkty`
+--
+
+INSERT INTO `produkty` (`id`, `tytul`, `opis`, `data_utworzenia`, `data_modyfikacji`, `data_wygasniecia`, `cena_netto`, `podatek_vat`, `ilosc_dostepnych_sztuk`, `status_dostepnosci`, `kategoria`, `gabaryt_produktu`, `zdjecie_url`) VALUES
+(1, 'Wędka ', 'Wędka savage gear', '2024-01-05 14:48:02', '2024-01-05 15:15:55', '2024-06-27', 600.00, 8.00, 10000, 'Dostępny', 3, 'sredni', 'https://pleciona.pl/userdata/public/gfx/97947/Savage-Gear-SG4-Medium-Game-2%2C21cm-15-45-2cz.jpg');
+
 --
 -- Indeksy dla zrzutów tabel
 --
 
 --
--- Indeksy dla tabeli `categories`
+-- Indeksy dla tabeli `kategorie`
 --
-ALTER TABLE `categories`
+ALTER TABLE `kategorie`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -84,13 +114,20 @@ ALTER TABLE `page_list`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indeksy dla tabeli `produkty`
+--
+ALTER TABLE `produkty`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `kategoria` (`kategoria`);
+
+--
 -- AUTO_INCREMENT for dumped tables
 --
 
 --
--- AUTO_INCREMENT for table `categories`
+-- AUTO_INCREMENT for table `kategorie`
 --
-ALTER TABLE `categories`
+ALTER TABLE `kategorie`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
@@ -98,6 +135,22 @@ ALTER TABLE `categories`
 --
 ALTER TABLE `page_list`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+
+--
+-- AUTO_INCREMENT for table `produkty`
+--
+ALTER TABLE `produkty`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `produkty`
+--
+ALTER TABLE `produkty`
+  ADD CONSTRAINT `produkty_ibfk_1` FOREIGN KEY (`kategoria`) REFERENCES `kategorie` (`id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
