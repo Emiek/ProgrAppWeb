@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-type" content="text/html; charset=UTF-8" />
+		<link rel="stylesheet" href="style.css">
+		<meta http-equiv="Content-Language" content="pl" />
+		<meta name="Author" content="Patryk Bachanek" />
+        <script src="kolorujtlo.js"></script>
+        <script src="jquery.js"></script>
+		<title>Moje hobby to wędkarstwo</title>
+	</head>
+	<body>
+		<table class="menu">
+			<tr>
+				<td> <a href="main.html"> Home </a></td>
+				<td> <a href="beginner.html"> Wędkarstwo jak zacząć </a></td>
+				<td> <a href="spinning.html"> Spinning </a></td>
+				<td> <a href="grunt.html"> Grunt </a></td>
+				<td> <a href="splawik.html"> Spławik </a></td>
+				<td> <a href="kontakt.html"> Kontakt </a></td>
+			</tr>
+		</table>
+		<table class="container">
+			<tr>
+				<td>
+                    <h1>Witam na stronie o wędkarstwie</h1>
+				    <p><i>Na tej stronie dowiesz się jak zacząć wędkować, oraz opisze najbardziej popularne techniki łowienia.</i>
+                    </p>
+					<div class="content" style="clear: both; height: 930px">
+                        <div class="img_content">
+                            <img src="img/fish.jpg" style="float: center; width: 100% " />
+                        </div>
+					</div>
+				</td>
+			</tr>
+		</table>
+        <div id="animacjaTestowa1" class="test-block", style="clear: both; margin: 10px">
+            kliknij, a się powiększe
+        </div>
+        <script>
+            $("#animacjaTestowa1").on("click",function(){
+                        $(this).animate({
+                            width:"500px",
+                            opacity: 0.4,
+                            fontSize: "3em",
+                            borderWidth: "10px",
+                        }, 1500);
+                    });
+        </script>
+        <div id="animacjaTestowa2" class="test-block", style="clear: both; margin: 10px">
+            Najedż kursorem,a się powiększe
+        </div>
+        <script>
+            $("#animacjaTestowa2").on({
+                        "mouseover" : function(){
+                        $(this).animate({
+                            width: 300
+                        }, 800);
+                        },
+                        "mouseout" : function(){
+                        $(this).animate({
+                            width: 200
+                        }, 800);
+                        } 
+                    });
+        </script>
+        <div id="animacjaTestowa3" class="test-block", style="clear: both; margin: 10px">
+            Klikaj, abym urósł
+        </div>
+        <script>
+            $("#animacjaTestowa3").on("click", function(){
+                    if (!$(this).is(":animated")){
+                        $(this).animate({
+                            width: "+=" + 50,
+                            height: "+=" + 10,
+                            opacity: "-=" + 0.1,
+                            duration: 3000
+                        });
+                    }
+                    });
+        </script>
+	</body>
+</html>
