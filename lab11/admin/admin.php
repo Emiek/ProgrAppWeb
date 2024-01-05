@@ -592,7 +592,7 @@ if ($_SESSION['zalogowany'] === true) {
         // Pobierz dane produktu do edycji
         $produktDoEdycji = $zarzadzajProduktami->PobierzDaneProduktu($idEdytuj);
         // Wyświetl formularz edycji z danymi produktu
-        echo '<h2>Edytuj produkt o ID: ' . $idEdytuj . '</h2>';
+        echo '<h2 style="text-align: center">Edytuj produkt o ID: ' . $idEdytuj . '</h2>';
         echo '<form action="" method="post" class="forms_style" style="text-align: center">';
         echo '<label for="tytul">Tytuł:</label>';
         echo '<input type="hidden" name="idEdytuj" value="' . $idEdytuj . '">';
