@@ -2,7 +2,6 @@
 
 function PokazKontakt()
 {
-    // Kod HTML formularza kontaktowego
     $formularz = '
         <form action="" method="post">
             <label for="temat">Temat:</label>
@@ -27,13 +26,10 @@ function PokazKontakt()
     ';
 
     echo $formularz;
-
-    // Sprawdź, czy przycisk "Przypomnij hasło" został kliknięty
     if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['przypomnij_haslo']) && $_POST['przypomnij_haslo'] === 'true') {
         PrzypomnijHaslo();
     }
 
-    // Sprawdź, czy przycisk "Wyślij" został kliknięty
     if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['wyslij'])) {
         WyslijMailKontakt('adres_odbiorcy@example.com');
     }
@@ -41,7 +37,6 @@ function PokazKontakt()
 
 function WyslijMailKontakt($odbiorca)
 {
-    // Sprawdź, czy formularz został wysłany
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if (empty($_POST['temat']) || empty($_POST['tresc']) || empty($_POST['email'])) {
             echo '[nie_wypelniles_pola]';
@@ -59,7 +54,6 @@ function WyslijMailKontakt($odbiorca)
             $header .= "X-Priority: 3\n";
             $header .= "Return-Path: <" . $mail['sender'] . ">";
 
-            // Wysłanie maila
             mail($mail['recipient'], $mail['subject'], $mail['body'], $header);
 
             echo '[wiadomosc_wyslana]';
@@ -68,9 +62,8 @@ function WyslijMailKontakt($odbiorca)
 }
 function PrzypomnijHaslo()
 {
-    require_once 'cfg.php'; // Załaduj plik konfiguracyjny
+    require_once 'cfg.php';
 
-    // Sprawdź, czy formularz został wysłany
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if (empty($_POST['email'])) {
             echo '[nie_wypelniles_pola]';
@@ -88,7 +81,6 @@ function PrzypomnijHaslo()
             $header .= "X-Priority: 3\n";
             $header .= "Return-Path: <" . $mail['sender'] . ">";
 
-            // Wysłanie maila z hasłem
             WyslijMailKontakt($mail['recipient'], $mail['subject'], $mail['body'], $header);
         }
     } else {
@@ -97,7 +89,6 @@ function PrzypomnijHaslo()
 }
 function PokazFormularz()
 {
-    // Kod HTML formularza przypomnienia hasła
     $formularz = '
         <form action="" method="post">
             <label for="email">Email:</label>

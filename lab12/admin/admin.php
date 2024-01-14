@@ -218,17 +218,17 @@ class ZarzadzajKategoriami
     // Prywatna funkcja do generowania drzewa kategorii
     private function GenerujDrzewoKategorii($matka = 0)
     {
-        $query = "SELECT id, nazwa FROM kategorie WHERE matka = ?";
+        $query = "SELECT id, nazwa, matka FROM kategorie WHERE matka = ?";
         $stmt = $this->conn->prepare($query);
         $stmt->bind_param('i', $matka);
         $stmt->execute();
-        $stmt->bind_result($id, $nazwa);
+        $stmt->bind_result($id, $nazwa, $matka);
         $stmt->store_result();
 
         echo '<ul>';
         while ($stmt->fetch()) {
-            echo '<li>' . $nazwa . ' (id: ' . $id . ')';
-            $this->GenerujDrzewoKategorii($id); // Rekurencyjne wywołanie dla podkategorii
+            echo '<li>' . $nazwa . ' (id: ' . $id . '), (matka: ' . $matka . ')';
+            $this->GenerujDrzewoKategorii($id);
             echo '</li>';
         }
         echo '</ul>';
@@ -238,10 +238,9 @@ class ZarzadzajKategoriami
 }
 
 
-// Utwórz obiekt ZarzadzajKategoriami
 $zarzadzajKategoriami = new ZarzadzajKategoriami();
 
-// Obsługa formularza dodawania kategorii
+
 if (isset($_POST['DodajKategorie'])) {
     $matka = $_POST['matkaId'];
     $nazwa = $_POST['nazwaKategorii'];
@@ -258,7 +257,7 @@ if (isset($_POST['UsunKategorie'])) {
     exit();
 }
 
-// Obsługa formularza edycji kategorii
+
 if (isset($_POST['EdytujKategorie'])) {
     $kategoriaId = $_POST['kategoriaIdEdytuj'];
     $nowaNazwa = $_POST['nowaNazwa'];
@@ -274,19 +273,18 @@ class ZarzadzajProduktami
 
     public function __construct()
     {
-        // Utwórz połączenie z bazą danych
+
         $this->conn = db_connect();
     }
 
     public function __destruct()
     {
-        // Zamknij połączenie z bazą danych po zakończeniu działania skryptu
+
         if ($this->conn) {
             $this->conn->close();
         }
     }
 
-    // Dodaj nowy produkt
     public function DodajProdukt($tytul, $opis, $dataWygasniecia, $cenaNetto, $podatekVat, $iloscSztuk, $kategoria, $gabarytProduktu, $zdjecieUrl)
     {
         $query = "INSERT INTO produkty (tytul, opis, data_wygasniecia, cena_netto, podatek_vat, ilosc_dostepnych_sztuk, kategoria, gabaryt_produktu, zdjecie_url) 
@@ -297,7 +295,6 @@ class ZarzadzajProduktami
         $stmt->close();
     }
 
-    // Usuń produkt
     public function UsunProdukt($produktId)
     {
         $query = "DELETE FROM produkty WHERE id = ?";
@@ -307,7 +304,6 @@ class ZarzadzajProduktami
         $stmt->close();
     }
 
-    // Edytuj produkt
     public function EdytujProdukt($produktId, $tytul, $opis, $dataWygasniecia, $cenaNetto, $podatekVat, $iloscSztuk, $kategoria, $gabarytProduktu, $zdjecieUrl)
     {
         $query = "UPDATE produkty SET tytul = ?, opis = ?, data_wygasniecia = ?, cena_netto = ?, podatek_vat = ?, 
@@ -328,11 +324,10 @@ class ZarzadzajProduktami
         $stmt->fetch();
         $stmt->close();
 
-        // Warunki dostępności
         if ($statusDostepnosci === 'Dostępny' && $iloscDostepnychSztuk > 0 && ($dataWygasniecia === null || strtotime($dataWygasniecia) > time())) {
-            return true; // Produkt jest dostępny
+            return true;
         } else {
-            return false; // Produkt jest niedostępny
+            return false;
         }
     }
 
@@ -349,7 +344,6 @@ class ZarzadzajProduktami
         return $produkt;
     }
 
-    // Wyświetl produkty
     public function PokazProdukty()
     {
         $query = "SELECT p.*, k.nazwa as nazwa_kategorii FROM produkty p
@@ -378,10 +372,8 @@ class ZarzadzajProduktami
             echo '<tr>';
             foreach ($row as $key => $value) {
                 if ($key === 'zdjecie_url' && filter_var($value, FILTER_VALIDATE_URL)) {
-                    // Jeśli wartość to link do obrazu, wyświetl obraz
                     echo '<td><img style="max-height: 100px; max-width: 100px"src="' . $value . '" alt="Zdjęcie"></td>';
                 } else {
-                    // W przeciwnym razie wyświetl normalnie
                     echo '<td>' . $value . '</td>';
                 }
             }
@@ -404,7 +396,6 @@ class ZarzadzajProduktami
 
 $zarzadzajProduktami = new ZarzadzajProduktami();
 
-// Sprawdź, czy formularz został przesłany i dodaj nowy produkt
 if (isset($_POST['dodajProdukt'])) {
     $tytul = $_POST['tytul'];
     $opis = $_POST['opis'];
@@ -416,7 +407,7 @@ if (isset($_POST['dodajProdukt'])) {
     $gabarytProduktu = $_POST['gabarytProduktu'];
     $zdjecieUrl = $_POST['zdjecieUrl'];
 
-    // Dodaj nowy produkt
+
     $zarzadzajProduktami->DodajProdukt($tytul, $opis, $dataWygasniecia, $cenaNetto, $podatekVat, $iloscSztuk, $kategoria, $gabarytProduktu, $zdjecieUrl);
     header("Location: " . $_SERVER['PHP_SELF']);
     exit();
@@ -425,7 +416,7 @@ if (isset($_POST['dodajProdukt'])) {
 
 if (isset($_POST['usunProdukt'])) {
     $idUsun = $_POST['idUsun'];
-    // Usuń produkt
+
     $zarzadzajProduktami->UsunProdukt($idUsun);
 }
 ?>
@@ -479,7 +470,7 @@ if ($_SESSION['zalogowany'] === true) {
         $conn = db_connect();
         $stmt = $conn->prepare("INSERT INTO page_list (page_title, page_content, status) VALUES (?, ?, ?)");
 
-        $statusNowejPodstrony = 1; // Domyślnie ustaw na aktywną, możesz dostosować według potrzeb
+        $statusNowejPodstrony = 1;
 
         $stmt->bind_param('ssi', $nowyTytul, $nowaZawartosc, $statusNowejPodstrony);
         $stmt->execute();
@@ -509,7 +500,6 @@ if ($_SESSION['zalogowany'] === true) {
         $nowyGabarytProduktu = $_POST['gabarytProduktu'];
         $noweZdjecieUrl = $_POST['zdjecieUrl'];
 
-        // Wywolaj funkcje edycji produktu
         $zarzadzajProduktami->EdytujProdukt($idEdytuj, $nowyTytul, $nowyOpis, $nowaDataWygasniecia, $nowaCenaNetto, $nowyPodatekVat, $nowaIloscSztuk, $nowaKategoria, $nowyGabarytProduktu, $noweZdjecieUrl);
         header("Location: {$_SERVER['PHP_SELF']}");
         exit();
@@ -581,17 +571,14 @@ if ($_SESSION['zalogowany'] === true) {
             <input type="submit" name="dodajProdukt" value="Dodaj Produkt">
         </form>
         
-        <!-- Wyświetlanie produktów -->
         <h2>Lista Produktów</h2>';
-// Utwórz obiekt klasy ZarzadzajProduktami
 
-    // Wyświetl listę produktów
     $zarzadzajProduktami->PokazProdukty();
     if (isset($_POST['edytujProdukt'])) {
         $idEdytuj = $_POST['idEdytuj'];
-        // Pobierz dane produktu do edycji
+
         $produktDoEdycji = $zarzadzajProduktami->PobierzDaneProduktu($idEdytuj);
-        // Wyświetl formularz edycji z danymi produktu
+        // formularz edycji z danymi produktu
         echo '<h2 style="text-align: center">Edytuj produkt o ID: ' . $idEdytuj . '</h2>';
         echo '<form action="" method="post" class="forms_style" style="text-align: center">';
         echo '<label for="tytul">Tytuł:</label>';
