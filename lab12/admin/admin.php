@@ -314,23 +314,6 @@ class ZarzadzajProduktami
         $stmt->close();
     }
 
-    public function SprawdzDostepnoscProduktu($produktId)
-    {
-        $query = "SELECT status_dostepnosci, ilosc_dostepnych_sztuk, data_wygasniecia FROM produkty WHERE id = ?";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bind_param('i', $produktId);
-        $stmt->execute();
-        $stmt->bind_result($statusDostepnosci, $iloscDostepnychSztuk, $dataWygasniecia);
-        $stmt->fetch();
-        $stmt->close();
-
-        if ($statusDostepnosci === 'Dostępny' && $iloscDostepnychSztuk > 0 && ($dataWygasniecia === null || strtotime($dataWygasniecia) > time())) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
     public function PobierzDaneProduktu($produktId)
     {
         $query = "SELECT * FROM produkty WHERE id = ?";

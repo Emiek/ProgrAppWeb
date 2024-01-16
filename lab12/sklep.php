@@ -106,11 +106,11 @@ $koszyk = new Koszyk();
 function ListaProduktow()
 {
     $conn = db_connect();
-    $query = "SELECT p.id, p.tytul, p.opis, p.cena_netto, p.podatek_vat, p.ilosc_dostepnych_sztuk, gabaryt_produktu, p.zdjecie_url, k.nazwa as nazwa_kategorii FROM produkty p
+    $query = "SELECT p.id, p.tytul, p.opis, p.cena_netto, p.podatek_vat, p.ilosc_dostepnych_sztuk, gabaryt_produktu, p.zdjecie_url, p.status_dostepnosci, k.nazwa as nazwa_kategorii FROM produkty p
                   LEFT JOIN kategorie k ON p.kategoria = k.id";
     $stmt = $conn->prepare($query);
     $stmt->execute();
-    $stmt->bind_result($id, $tytul, $opis, $cena_netto, $podatek_vat, $ilosc_dostepnych_sztuk, $gabaryt_produktu, $zdjecie_url, $nazwa_kategorii);
+    $stmt->bind_result($id, $tytul, $opis, $cena_netto, $podatek_vat, $ilosc_dostepnych_sztuk, $gabaryt_produktu, $zdjecie_url, $status_dostepnosci, $nazwa_kategorii);
 
 
     echo '<table border="1">
@@ -138,9 +138,16 @@ function ListaProduktow()
                 <form action="" method="post" style="display: inline-block;">
                     <input type="hidden" name="idDodaj" value="' . $id . '">
                     <input type="hidden" name="tytul_p" value="' . $tytul . '">
-                    <input type="hidden" name="cena_b" value="' . $cena_brutto . '">
-                    <input type="number" name="iloscProduktow" value="1" min="1">
-                    <input type="submit" name="DodajKoszyk" value="Dodaj do koszyka">
+                    <input type="hidden" name="cena_b" value="' . $cena_brutto . '">';
+        if($status_dostepnosci == 'Dostępny'){
+            echo '<input type="number" name="iloscProduktow" value="1" min="1">
+                  <input type="submit" name="DodajKoszyk" value="Dodaj do koszyka">';
+        }
+        else {
+            echo '<input type="number" disabled value="1" min="1">
+                  <input type="submit" disabled value="Brak produktu">';
+        }
+        echo '
                 </form>
               </td>';
         echo '</tr>';
