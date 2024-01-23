@@ -40,7 +40,7 @@ function ListaPodstron()
     $stmt = $conn->prepare($query);
     $stmt->execute();
     $stmt->bind_result($id, $page_title, $page_content, $status);
-    echo'<div style="width: 100%">';
+    echo '<div style="width: 100%">';
     while ($stmt->fetch()) {
         echo '<div class="page-entry" style="margin: 0 auto; display: flex;align-items: center; width: 300px;">
             <p>' . htmlspecialchars($id) . ' ' . htmlspecialchars($page_title) . '        
@@ -288,14 +288,16 @@ class ZarzadzajProduktami
         }
     }
 
-    public function DodajProdukt($tytul, $opis, $dataWygasniecia, $cenaNetto, $podatekVat, $iloscSztuk, $kategoria, $gabarytProduktu, $zdjecieUrl)
+    public function DodajProdukt($tytul, $opis, $dataWygasniecia, $cenaNetto, $podatekVat, $iloscSztuk, $kategoria, $gabarytProduktu, $SciezkaZdjecia)
     {
+
         $query = "INSERT INTO produkty (tytul, opis, data_wygasniecia, cena_netto, podatek_vat, ilosc_dostepnych_sztuk, kategoria, gabaryt_produktu, zdjecie_url) 
                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt = $this->conn->prepare($query);
-        $stmt->bind_param('sssdidiss', $tytul, $opis, $dataWygasniecia, $cenaNetto, $podatekVat, $iloscSztuk, $kategoria, $gabarytProduktu, $zdjecieUrl);
+        $stmt->bind_param('sssdidiss', $tytul, $opis, $dataWygasniecia, $cenaNetto, $podatekVat, $iloscSztuk, $kategoria, $gabarytProduktu, $SciezkaZdjecia);
         $stmt->execute();
         $stmt->close();
+
     }
 
     public function UsunProdukt($produktId)
@@ -357,7 +359,7 @@ class ZarzadzajProduktami
         while ($row = $result->fetch_assoc()) {
             echo '<tr>';
             foreach ($row as $key => $value) {
-                if ($key === 'zdjecie_url' && filter_var($value, FILTER_VALIDATE_URL)) {
+                if ($key === 'zdjecie_url') {
                     echo '<td><img style="max-height: 100px; max-width: 100px"src="' . $value . '" alt="Zdjęcie"></td>';
                 } else {
                     echo '<td>' . $value . '</td>';
@@ -392,19 +394,21 @@ if (isset($_POST['dodajProdukt'])) {
     $iloscSztuk = $_POST['iloscSztuk'];
     $kategoria = $_POST['kategoria'];
     $gabarytProduktu = $_POST['gabarytProduktu'];
+    $zdjecieTmpPath = $_FILES['zdjecieUrl']['tmp_name'];
+    $zdjecieName = $_FILES['zdjecieUrl']['name'];
 
-    $uploadDir = "C:/xampp/htdocs/164333_Web/uploads/";
-    $uploadedFile = $uploadDir . basename($_FILES["zdjecieUrl"]["name"]);
+    // Nowa ścieżka do zapisania zdjęcia
+    $nowaSciezkaZdjecia = 'uploads/' . $zdjecieName;
 
-    if (move_uploaded_file($_FILES["zdjecieUrl"]["tmp_name"], $uploadedFile)) {
-        $zdjecieUrl = $uploadedFile;
+    // Przenieś plik do docelowej lokalizacji
+    if (move_uploaded_file($zdjecieTmpPath, $nowaSciezkaZdjecia)) {
+        // Dodaj nowy produkt do bazy danych, uwzględniając nową ścieżkę do zdjęcia
+        $zarzadzajProduktami->DodajProdukt($tytul, $opis, $dataWygasniecia, $cenaNetto, $podatekVat, $iloscSztuk, $kategoria, $gabarytProduktu, $nowaSciezkaZdjecia);
+        header("Location: " . $_SERVER['PHP_SELF']);
+        exit();
     } else {
-        echo "Sorry, there was an error uploading your file.";
+        echo 'Błąd podczas przesyłania zdjęcia.';
     }
-
-    $zarzadzajProduktami->DodajProdukt($tytul, $opis, $dataWygasniecia, $cenaNetto, $podatekVat, $iloscSztuk, $kategoria, $gabarytProduktu, $zdjecieUrl);
-    header("Location: " . $_SERVER['PHP_SELF']);
-    exit();
 }
 
 
@@ -494,11 +498,19 @@ if ($_SESSION['zalogowany'] === true) {
         $nowaIloscSztuk = $_POST['iloscSztuk'];
         $nowaKategoria = $_POST['kategoria'];
         $nowyGabarytProduktu = $_POST['gabarytProduktu'];
-        $noweZdjecieUrl = $_POST['zdjecieUrl'];
+        $zdjecieTmpPath = $_FILES['zdjecieUrl']['tmp_name'];
+        $zdjecieName = $_FILES['zdjecieUrl']['name'];
 
-        $zarzadzajProduktami->EdytujProdukt($idEdytuj, $nowyTytul, $nowyOpis, $nowaDataWygasniecia, $nowaCenaNetto, $nowyPodatekVat, $nowaIloscSztuk, $nowaKategoria, $nowyGabarytProduktu, $noweZdjecieUrl);
-        header("Location: {$_SERVER['PHP_SELF']}");
-        exit();
+        $nowaSciezkaZdjecia = 'uploads/' . $zdjecieName;
+
+        if (move_uploaded_file($zdjecieTmpPath, $nowaSciezkaZdjecia)) {
+            $zarzadzajProduktami->EdytujProdukt($idEdytuj, $nowyTytul, $nowyOpis, $nowaDataWygasniecia, $nowaCenaNetto, $nowyPodatekVat, $nowaIloscSztuk, $nowaKategoria, $nowyGabarytProduktu,  $nowaSciezkaZdjecia);
+            header("Location: {$_SERVER['PHP_SELF']}");
+            exit();
+        } else {
+            echo 'Błąd podczas przesyłania zdjęcia.';
+        }
+
     }
 
     echo '<h2 style="text-align: center">Lista kategorii</h2>';
@@ -535,8 +547,9 @@ if ($_SESSION['zalogowany'] === true) {
         <h2 style="text-align: center">Panel Zarządzania Produktami</h2>
         
         <!-- Dodawanie nowego produktu -->
-        <form action="" method="post" style="text-align: center" class="forms_style">
+        <form method="post" enctype="multipart/form-data" style="text-align: center" class="forms_style">
             <h3>Dodaj nowy produkt</h3>
+            
             <label for="tytul">Tytuł:</label>
             <input type="text" id="tytul" name="tytul" required>
             <br>
@@ -576,7 +589,7 @@ if ($_SESSION['zalogowany'] === true) {
         $produktDoEdycji = $zarzadzajProduktami->PobierzDaneProduktu($idEdytuj);
         // formularz edycji z danymi produktu
         echo '<h2 style="text-align: center">Edytuj produkt o ID: ' . $idEdytuj . '</h2>';
-        echo '<form action="" method="post" class="forms_style" style="text-align: center">';
+        echo '<form method="post" enctype="multipart/form-data" class="forms_style" style="text-align: center">';
         echo '<label for="tytul">Tytuł:</label>';
         echo '<input type="hidden" name="idEdytuj" value="' . $idEdytuj . '">';
         echo '<input type="text" id="tytul" name="tytul" value="' . htmlspecialchars($produktDoEdycji['tytul']) . '" required>';
@@ -602,8 +615,12 @@ if ($_SESSION['zalogowany'] === true) {
         echo '<label for="gabarytProduktu">Gabaryt Produktu:</label>';
         echo '<input type="text" id="gabarytProduktu" name="gabarytProduktu" value="' . htmlspecialchars($produktDoEdycji['gabaryt_produktu']) . '" required>';
         echo '<br>';
+        echo 'Akutalne zdjecie:';
+        echo '<br>';
+        echo '<img style="max-height: 100px; max-width: 100px" src="' . $produktDoEdycji['zdjecie_url'] . '" alt="Obecne Zdjęcie">';
+        echo '<br>';
         echo '<label for="zdjecieUrl">Zdjęcie URL:</label>';
-        echo '<input type="text" id="zdjecieUrl" name="zdjecieUrl" value="' . htmlspecialchars($produktDoEdycji['zdjecie_url']) . '" required>';
+        echo '<input type="file" id="zdjecieUrl" name="zdjecieUrl" accept="image/*" required>';
         echo '<br>';
         echo '<input type="submit" name="zapiszEdycje" value="Zapisz Edycję">';
         echo '</form>';

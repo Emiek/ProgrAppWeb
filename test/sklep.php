@@ -131,7 +131,7 @@ function ListaProduktow()
         echo '<td>' . $ilosc_dostepnych_sztuk . '</td>';
         echo '<td>' . $gabaryt_produktu . '</td>';
         echo '<td>' . $cena_brutto . '</td>';
-        echo '<td><img style="max-height: 100px; max-width: 100px"src="' . $zdjecie_url . '" alt="Zdjęcie"></td>';
+        echo '<td><img style="max-height: 100px; max-width: 100px" src=admin/' . $zdjecie_url . ' alt="Zdjęcie"></td>';
         echo '<td>' . $nazwa_kategorii . '</td>';
 
         echo '<td>
@@ -139,11 +139,10 @@ function ListaProduktow()
                     <input type="hidden" name="idDodaj" value="' . $id . '">
                     <input type="hidden" name="tytul_p" value="' . $tytul . '">
                     <input type="hidden" name="cena_b" value="' . $cena_brutto . '">';
-        if($status_dostepnosci == 'Dostępny'){
+        if ($status_dostepnosci == 'Dostępny') {
             echo '<input type="number" name="iloscProduktow" value="1" min="1">
                   <input type="submit" name="DodajKoszyk" value="Dodaj do koszyka">';
-        }
-        else {
+        } else {
             echo '<input type="number" disabled value="1" min="1">
                   <input type="submit" disabled value="Brak produktu">';
         }
@@ -156,7 +155,8 @@ function ListaProduktow()
     echo '</table>';
 }
 
-function WyswietlProduktyPokategorii($categoryID) {
+function WyswietlProduktyPokategorii($categoryID)
+{
     $conn = db_connect();
 
     $query = "SELECT p.id, p.tytul, p.opis, p.cena_netto, p.podatek_vat, p.ilosc_dostepnych_sztuk, gabaryt_produktu, p.zdjecie_url, p.status_dostepnosci, k.nazwa as nazwa_kategorii FROM produkty p
@@ -168,36 +168,56 @@ function WyswietlProduktyPokategorii($categoryID) {
     $stmt->execute();
     $stmt->bind_result($id, $tytul, $opis, $cena_netto, $podatek_vat, $ilosc_dostepnych_sztuk, $gabaryt_produktu, $zdjecie_url, $status_dostepnosci, $nazwa_kategorii);
 
-    echo '<table border="1">
-            <tr>
-                <th>Tytuł</th>
-                <th>Opis</th>
-                <th>Ilość Dostępnych Sztuk</th>
-                <th>Gabaryt Produktu</th>
-                <th>Cena brutto</th>
-                <th>Zdjęcie</th>
-                <th>Nazwa Kategorii</th>
-            </tr>';
+    if ($stmt->fetch()) {
+        echo '<table border="1">
+        <tr>
+            <th>Tytuł</th>
+            <th>Opis</th>
+            <th>Ilość Dostępnych Sztuk</th>
+            <th>Gabaryt Produktu</th>
+            <th>Cena brutto</th>
+            <th>Zdjęcie</th>
+            <th>Nazwa Kategorii</th>
+        </tr>';
+        do {
+            $cena_brutto = $cena_netto + ($podatek_vat / 100 * $cena_netto);
+            echo '<tr>';
+            echo '<td>' . $tytul . '</td>';
+            echo '<td>' . $opis . '</td>';
+            echo '<td>' . $ilosc_dostepnych_sztuk . '</td>';
+            echo '<td>' . $gabaryt_produktu . '</td>';
+            echo '<td>' . $cena_brutto . '</td>';
+            echo '<td><img style="max-height: 100px; max-width: 100px" src=admin/' . $zdjecie_url . ' alt="Zdjęcie"></td>';
+            echo '<td>' . $nazwa_kategorii . '</td>';
+            echo '<td>
+                <form action="" method="post" style="display: inline-block;">
+                    <input type="hidden" name="idDodaj" value="' . $id . '">
+                    <input type="hidden" name="tytul_p" value="' . $tytul . '">
+                    <input type="hidden" name="cena_b" value="' . $cena_brutto . '">';
+            if ($status_dostepnosci == 'Dostępny') {
+                echo '<input type="number" name="iloscProduktow" value="1" min="1">
+                  <input type="submit" name="DodajKoszyk" value="Dodaj do koszyka">';
+            } else {
+                echo '<input type="number" disabled value="1" min="1">
+                  <input type="submit" disabled value="Brak produktu">';
+            }
+            echo '
+                </form>
+              </td>';
+            echo '</tr>';
+        } while ($stmt->fetch());
 
-    while ($stmt->fetch()) {
-        $cena_brutto = $cena_netto + ($podatek_vat / 100 * $cena_netto);
-        echo '<tr>';
-        echo '<td>' . $tytul . '</td>';
-        echo '<td>' . $opis . '</td>';
-        echo '<td>' . $ilosc_dostepnych_sztuk . '</td>';
-        echo '<td>' . $gabaryt_produktu . '</td>';
-        echo '<td>' . $cena_brutto . '</td>';
-        echo '<td><img style="max-height: 100px; max-width: 100px"src="' . $zdjecie_url . '" alt="Zdjęcie"></td>';
-        echo '<td>' . $nazwa_kategorii . '</td>';
-        echo '</tr>';
+        echo '</table>';
+    } else {
+        echo '<p>Brak produktów w danej kategorii</p>';
     }
 
-    echo '</table>';
 
     $stmt->close();
 }
 
-function ListaKategorii() {
+function ListaKategorii()
+{
     $conn = db_connect();
     $query = "SELECT id, nazwa FROM kategorie";
     $stmt = $conn->prepare($query);
@@ -218,8 +238,6 @@ function ListaKategorii() {
 
     $stmt->close();
 }
-
-
 
 
 if (isset($_POST['DodajKoszyk'])) {
@@ -260,8 +278,8 @@ if (isset($_POST['EdytujIlosc'])) {
     <title>Admin panel</title>
 </head>
 <body>
-    <div style="width: 100%; display: flex;">
-        <div style="margin: 0 auto">
+<div style="width: 100%; display: flex;">
+    <div style="margin: 0 auto">
         <?php
         $koszyk->showCard();
         echo '<br/><br/>';
@@ -271,9 +289,10 @@ if (isset($_POST['EdytujIlosc'])) {
             WyswietlProduktyPokategorii($kategoriaID);
         }
         echo '<br/><br/>';
+        echo '<h2>Lista wszystkich produktów</h2>';
         ListaProduktow();
         ?>
-        </div>
     </div>
+</div>
 </body>
 </html>
