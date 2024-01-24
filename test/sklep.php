@@ -144,7 +144,7 @@ function ListaProduktow()
                   <input type="submit" name="DodajKoszyk" value="Dodaj do koszyka">';
         } else {
             echo '<input type="number" disabled value="1" min="1">
-                  <input type="submit" disabled value="Brak produktu">';
+                  <input type="submit" disabled value="Brak produktu" class="disable">';
         }
         echo '
                 </form>
@@ -199,7 +199,7 @@ function WyswietlProduktyPokategorii($categoryID)
                   <input type="submit" name="DodajKoszyk" value="Dodaj do koszyka">';
             } else {
                 echo '<input type="number" disabled value="1" min="1">
-                  <input type="submit" disabled value="Brak produktu">';
+                  <input type="submit" disabled value="Brak produktu" class="disable">';
             }
             echo '
                 </form>
@@ -273,6 +273,7 @@ if (isset($_POST['EdytujIlosc'])) {
 <head>
     <meta http-equiv="Content-type" content="text/html; charset=UTF-8"/>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/sklep_css.css">
     <meta http-equiv="Content-Language" content="pl"/>
     <meta name="Author" content="Patryk Bachanek"/>
     <title>Admin panel</title>

@@ -423,7 +423,7 @@ if (isset($_POST['usunProdukt'])) {
 <html>
 <head>
     <meta http-equiv="Content-type" content="text/html; charset=UTF-8"/>
-    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/style_admin.css">
     <meta http-equiv="Content-Language" content="pl"/>
     <meta name="Author" content="Patryk Bachanek"/>
     <title>Admin panel</title>
@@ -434,7 +434,7 @@ if (isset($_POST['usunProdukt'])) {
 if ($_SESSION['zalogowany'] === true) {
     echo '<h2 style="text-align: center">Zarządzanie stronami</h2>';
     ListaPodstron();
-    echo '<form style="width: 300px; margin: 0 auto;" method="post"><input type="submit" name="Dodaj" value="Dodaj"></form>';
+    echo '<form style="width: 300px; margin: 0 auto; display: block;" method="post"><input type="submit" name="Dodaj" value="Dodaj"></form>';
     echo '<br/><br/>';
     if (isset($_POST['Dodaj'])) {
         DodajNowaPodstrone();
@@ -518,36 +518,38 @@ if ($_SESSION['zalogowany'] === true) {
     $zarzadzajKategoriami->PokazKategorie();
 
     echo '
-        
-        <!-- Formularz dodawania kategorii -->
-        <form method="post" class="forms_style">
-            <label for="matkaId">Kategoria nadrzędna (0 dla głównej): </label>
-            <input type="number" name="matkaId" id="matkaId" required>
-            <label for="nazwaKategorii">Nazwa kategorii: </label>
-            <input type="text" name="nazwaKategorii" id="nazwaKategorii" required>
-            <input type="submit" name="DodajKategorie" value="Dodaj kategorię">
-        </form>
-        
-        <!-- Formularz usuwania kategorii -->
-        <form method="post" class="forms_style">
-            <label for="kategoriaId">ID kategorii do usunięcia: </label>
-            <input type="number" name="kategoriaId" id="kategoriaId" required>
-            <input type="submit" name="UsunKategorie" value="Usuń kategorię">
-        </form>
-        
-        <!-- Formularz edycji kategorii -->
-        <form method="post" class="forms_style">
-            <label for="kategoriaIdEdytuj">ID kategorii do edycji: </label>
-            <input type="number" name="kategoriaIdEdytuj" id="kategoriaIdEdytuj" required>
-            <label for="nowaNazwa">Nowa nazwa kategorii: </label>
-            <input type="text" name="nowaNazwa" id="nowaNazwa" required>
-            <input type="submit" name="EdytujKategorie" value="Edytuj kategorię">
-        </form>';
+        <div style="margin: 0 auto; width: 900px;">
+            <!-- Formularz dodawania kategorii -->
+            <form method="post">
+                <label for="matkaId">Kategoria nadrzędna (0 dla głównej): </label>
+                <input type="number" name="matkaId" id="matkaId" required>
+                <label for="nazwaKategorii">Nazwa kategorii: </label>
+                <input type="text" name="nazwaKategorii" id="nazwaKategorii" required>
+                <input type="submit" name="DodajKategorie" value="Dodaj kategorię">
+            </form>
+            
+            <!-- Formularz usuwania kategorii -->
+            <form method="post">
+                <label for="kategoriaId">ID kategorii do usunięcia: </label>
+                <input type="number" name="kategoriaId" id="kategoriaId" required>
+                <input type="submit" name="UsunKategorie" value="Usuń kategorię">
+            </form>
+            
+            <!-- Formularz edycji kategorii -->
+            <form method="post">
+                <label for="kategoriaIdEdytuj">ID kategorii do edycji: </label>
+                <input type="number" name="kategoriaIdEdytuj" id="kategoriaIdEdytuj" required>
+                <label for="nowaNazwa">Nowa nazwa kategorii: </label>
+                <input type="text" name="nowaNazwa" id="nowaNazwa" required>
+                <input type="submit" name="EdytujKategorie" value="Edytuj kategorię">
+            </form>
+        </div>';
     echo '
+       <div style="margin: 0 auto; width: 300px;">
         <h2 style="text-align: center">Panel Zarządzania Produktami</h2>
         
         <!-- Dodawanie nowego produktu -->
-        <form method="post" enctype="multipart/form-data" style="text-align: center" class="forms_style">
+        <form method="post" enctype="multipart/form-data" style="text-align: center" >
             <h3>Dodaj nowy produkt</h3>
             
             <label for="tytul">Tytuł:</label>
@@ -579,6 +581,7 @@ if ($_SESSION['zalogowany'] === true) {
             <br>
             <input type="submit" name="dodajProdukt" value="Dodaj Produkt">
         </form>
+        </div>
         
         <h2 style="text-align: center;">Lista Produktów</h2>';
 
@@ -588,8 +591,9 @@ if ($_SESSION['zalogowany'] === true) {
 
         $produktDoEdycji = $zarzadzajProduktami->PobierzDaneProduktu($idEdytuj);
         // formularz edycji z danymi produktu
+        echo'<div style="margin: 0 auto; width: 300px;">';
         echo '<h2 style="text-align: center">Edytuj produkt o ID: ' . $idEdytuj . '</h2>';
-        echo '<form method="post" enctype="multipart/form-data" class="forms_style" style="text-align: center">';
+        echo '<form method="post" enctype="multipart/form-data" style="text-align: center">';
         echo '<label for="tytul">Tytuł:</label>';
         echo '<input type="hidden" name="idEdytuj" value="' . $idEdytuj . '">';
         echo '<input type="text" id="tytul" name="tytul" value="' . htmlspecialchars($produktDoEdycji['tytul']) . '" required>';
@@ -624,6 +628,7 @@ if ($_SESSION['zalogowany'] === true) {
         echo '<br>';
         echo '<input type="submit" name="zapiszEdycje" value="Zapisz Edycję">';
         echo '</form>';
+        echo '</div>';
     }
 
 }
